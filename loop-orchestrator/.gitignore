@@ -1,0 +1,10 @@
+# node_modules — 包管理缓存, 不进版本控制
+node_modules/
+package-lock.json
+
+# 装置产物 — 由 install.js 重新生成, 不进版本控制
+capabilities.json
+
+# Python 临时产物
+__pycache__/
+*.pyc

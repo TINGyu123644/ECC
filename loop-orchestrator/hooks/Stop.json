@@ -1,0 +1,11 @@
+{
+  "version": "1",
+  "event": "Stop",
+  "description": "session 结束时打印 loop 状态。从 .claude/settings.json:46-55 拆出。",
+  "hooks": [
+    {
+      "name": "print-loop-state",
+      "command": "bash .claude/_runtime_python.sh .claude/skills/loop-control/scripts/loop_state.py get"
+    }
+  ]
+}

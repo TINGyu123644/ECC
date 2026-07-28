@@ -1,0 +1,22 @@
+{
+  "version": "1",
+  "event": "PreToolUse",
+  "description": "3 个 PreToolUse 拦截器，从 .claude/settings.json:14-44 拆出。段 2 物理外迁。",
+  "hooks": [
+    {
+      "matcher": "Bash",
+      "name": "deny-dangerous-commands",
+      "command": "input=$(cat); value=$(echo \"$input\" | bash .claude/_runtime_python.sh -c \"import json,sys; print(json.load(sys.stdin).get('tool_input',{}).get('command',''))\" 2>/dev/null); if echo \"$value\" | grep -E 'git push|--force|rm -rf' >/dev/null 2>&1; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"硬拦截危险命令; 需要 push 时由人类手动执行\"}}'; fi; exit 0"
+    },
+    {
+      "matcher": "Edit|Write|MultiEdit",
+      "name": "deny-state-tamper",
+      "command": "input=$(cat); value=$(echo \"$input\" | bash .claude/_runtime_python.sh -c \"import json,sys; print(json.load(sys.stdin).get('tool_input',{}).get('file_path',''))\" 2>/dev/null); if echo \"$value\" | grep -E '\\.ai/loop/(state\\.json|commands\\.env)' >/dev/null 2>&1; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"禁止 Agent 直接篡改状态文件与门禁命令 — 只能走 loop_state.py\"}}'; fi; exit 0"
+    },
+    {
+      "matcher": "Edit|Write|MultiEdit",
+      "name": "deny-suppression-markers",
+      "command": "input=$(cat); value=$(echo \"$input\" | bash .claude/_runtime_python.sh -c \"import json,sys; print(json.load(sys.stdin).get('tool_input',{}).get('content',''))\" 2>/dev/null); if echo \"$value\" | grep -E 'eslint-disable|#\\[allow|type: ignore|@SuppressWarnings|noqa' >/dev/null 2>&1; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"规则生效层次红线: 禁止为消除告警添加抑制标记; 确需例外须向用户请示后由人放行\"}}'; fi; exit 0"
+    }
+  ]
+}

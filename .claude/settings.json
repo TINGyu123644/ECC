@@ -1,0 +1,54 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.hooks[0].command' loop-orchestrator/hooks/PostToolUse.json | bash"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.hooks[0].command' loop-orchestrator/hooks/PreToolUse.json | bash"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.hooks[1].command' loop-orchestrator/hooks/PreToolUse.json | bash"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.hooks[2].command' loop-orchestrator/hooks/PreToolUse.json | bash"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.hooks[0].command' loop-orchestrator/hooks/Stop.json | bash"
+          }
+        ]
+      }
+    ]
+  }
+}
