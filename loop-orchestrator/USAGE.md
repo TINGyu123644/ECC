@@ -124,6 +124,189 @@ $EDITOR SPEC.md
 | `bash loop-orchestrator/scripts/verify.sh` | 1+8 层门禁 |
 | `bash loop-orchestrator/scripts/verify.sh` 自动跑 | size-classify + security-gate + 全部层 |
 
+## 1.5. AI 自动填 commands.env + SPEC.md（推荐）
+
+**核心问题**：commands.env 和 SPEC.md 是数据，必须人填。但可以**让 AI 帮你填**（基于现有项目）。
+
+### 适用场景
+
+- 新项目刚 bootstrap，commands.env 还是模板（CMD_LINT="" / CMD_TEST=""）
+- 想给 SPEC.md 写初稿但不知道从哪下手
+- 接手别人项目，要快速生成 SPEC
+
+### 操作步骤
+
+#### 1. 命令 AI 收集项目信息
+
+```sh
+# 让 AI 看包配置 (Node 例子)
+cat package.json
+# 或 Python:
+cat pyproject.toml
+# 或 Go:
+cat go.mod
+```
+
+#### 2. 对 Claude Code 说：
+
+> "请帮我基于这个项目自动填 `<project-root>/.ai/loop/commands.env` 和 `SPEC.md`。 commands.env 看 `package.json` scripts 字段； SPEC.md 看项目结构 + README + 我的几句话 {粘 1 段自然语言需求}"
+
+#### 3. AI 自动做的事
+
+**commands.env**：
+- 读 `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod`
+- 提取 `scripts` 或自定义命令
+- 填 5 个核心变量（CMD_FMT / LINT / TYPECHECK / TEST / PROJECT_GATE）
+- 子模块项目用 `( cd <submodule> && <cmd> )` 格式
+
+**SPEC.md**：
+- 读项目根目录结构 + README + AGENTS.md
+- 提取项目类型 / 规模 / 风险
+- 填 10 段模板（聚焦第 4 段 AC）
+- 每条 AC 必含 Check 命令（可执行）
+
+#### 4. 验证 AI 填的结果
+
+```sh
+# commands.env 验证
+bash loop-orchestrator/scripts/verify.sh
+# 期望各层 PASS 或 SKIPPED
+
+# SPEC.md 验证
+python -c "
+import re
+text = open('SPEC.md').read()
+sections = re.findall(r'^## (\d+\. .+)$', text, re.MULTILINE)
+print(f'10 段: {len(sections)}/10 found')
+print(f'AC 数: {text.count(\"### AC-\")}')
+print(f'Check 数: {text.count(\"- **Check**\")}')
+"
+```
+
+### 实操示范（你刚刚用了）
+
+针对 c:\Users\26631\Desktop\ECC-main 项目：
+- AI 读 `package.json` + `ECC-main/package.json` 的 scripts 字段
+- 自动填 `commands.env`（段 1 阶段 context-scout 已填，12:43 落地）
+- 自动填 `SPEC.md`（本次演示，19:00 落地，含 5 条 AC + 11 段完整）
+
+## 1.6. 单独提取给团队/同学用 — 5 步
+
+**核心问题**：loop-orchestrator 现在依赖 ECC-main submodule（同仓库）。 提取 = 切割出去独立运行。
+
+### 当前依赖
+
+```
+loop-orchestrator/
+  install.js  ← 探测 ..ECC-main 或 ../../ECC-main
+  capability-scanner.js  ← 读 ECC-main/agents/ + skills/ + commands/
+  mini-installer.js  ← 复制 ECC-main/agents/*.md
+  state.py / verify.sh  ← 路径锚定 wrapper 根
+```
+
+### 5 步提取
+
+#### 1. 拷贝 loop-orchestrator 包
+
+```sh
+cp -r /path/to/loop-orchestrator ./loop-orchestrator
+```
+
+#### 2. 决定 ECC 依赖方式
+
+**选项 A（你项目里的方式）**：对方的 `ECC-main/` 必须存在（submodule）
+
+```sh
+# 朋友必须:
+git submodule add <ecc-url> ECC-main/  # 或 git clone 整个 ECC
+git submodule update --init ECC-main/
+```
+
+**选项 B（独立发布）**：把 ECC-main 嵌入 loop-orchestrator
+
+```sh
+# 把 ECC-main 克隆到 loop-orchestrator/vendor/ECC-main
+git clone <ecc-url> loop-orchestrator/vendor/ECC-main
+# 改 resolveEccRoot 默认探 5 处路径 (包括 ./vendor/ECC-main)
+```
+
+#### 3. 让 install.js 探测多路径
+
+当前 `resolveEccRoot` 探 5 处。 修改加 1 个：
+
+```js
+// loop-orchestrator/scripts/capability-scanner.js
+const candidates = [
+  process.env.LOOP_ORCH_ECC_ROOT,
+  path.resolve(__dirname, '..', '..', 'ECC-main'),
+  path.resolve(__dirname, '..', '..', 'ECC-main'),
+  path.resolve(__dirname, '..', '..', '..', 'ECC-main'),
+  path.resolve(__dirname, '..', '..', 'children', 'ECC-main'),
+  + path.resolve(__dirname, '..', 'vendor', 'ECC-main'),  // 新增
+];
+```
+
+#### 4. 路径锚定重写
+
+当前 `loop-orchestrator/scripts/state.py` 假设 wrapper 根是 `../..`。 提取后 wrapper 根可能变。 改：
+
+```python
+# scripts/state.py 改: 探测 wrapper 根
+WRAPPER_ROOT = Path(
+  os.environ.get('LOOP_ORCH_WRAPPER_ROOT')
+  or subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode().strip()
+)
+```
+
+#### 5. 打包发团队
+
+```sh
+# 选项 A: 给 git URL
+git remote add origin <你的 repo>
+git push origin master
+# 朋友:
+git clone <你的 repo>
+cd <repo>
+git submodule update --init ECC-main/
+node loop-orchestrator/bin/install.js
+
+# 选项 B: 打 tar
+tar -czf loop-orchestrator-v0.1.0.tar.gz loop-orchestrator/
+# 朋友解压 + 自带 ECC-main
+```
+
+### 提取后的限制
+
+| 限制 | 缓解 |
+|---|---|
+| 朋友必须有 ECC-main（35-50MB） | 选项 B 嵌入 vendor/ |
+| `.ai/loop/` 路径在不同项目根 | 改 state.py 的 wrapper 根探测 |
+| install.js 探测 5 路径不包含 vendor/ | 加路径（上面给了） |
+| hooks 物理外迁需 wrapper 同意 `.claude/settings.json` 改 | USAGE.md 写明 |
+
+### 给团队用的实际体验
+
+```sh
+# 朋友接受你的 loop-orchestrator 后:
+git clone <your-repo>
+cd <your-project>
+node loop-orchestrator/bin/install.js
+$EDITOR .ai/loop/commands.env   # 5 分钟
+$EDITOR SPEC.md                  # 20 分钟
+# 进入 VSCode + Claude Code 对话
+# 7 步 loop 启动
+```
+
+### 总结
+
+| 方式 | 适合 | 复杂度 |
+|---|---|---|
+| A 单独 git repo + ECC submodule | 团队/开源 | 中 |
+| B 嵌入 vendor/ECC-main | 私有发布 | 低 |
+| 复制到 shared dir (NFS) | 多人协作 | 极低 |
+
+**最简**：把 loop-orchestrator/ 整个文件夹 ZIP 发给朋友，附上一句话：**"解压 + 跑 install.js"**。
+
 ## 2. 核心命令速查
 
 | 命令 | 用途 |
