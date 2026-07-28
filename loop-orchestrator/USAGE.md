@@ -37,75 +37,92 @@ python loop-orchestrator/scripts/state.py set-phase CONTEXT
 #   ↑ 进入 CONTEXT 阶段
 ```
 
-## 1. 日常 7 步使用（一次完整循环）
+## 1. 日常 7 步使用（一次完整循环）— VSCode + Claude Code 对话
 
-### 第 1 步：用户提需求
+**重要**：loop-orchestrator 是给 Claude Code 用的编排规则，**不是命令行工具**。
+日常使用 = 在 VSCode 装 Claude Code 扩展，**在对话里说话**，AI 自动跑 7 步。
 
-在 wrapper 根对话描述需求，或改 `SPEC.md` 写 AC。也支持 PDF / 邮件 / 截图 → 通过 `requirement-clarifier.md` 路由壳解读。
-
-### 第 2 步：AI 自己分析需求
-
-```sh
-# 主线 (loop-orchestrator 路由壳)
-# 读 SPEC.md → 产出 Given/When/Then/Check 三件套
-# → 优先委派 ECC clarifying-questions skill
-# → fallback 用本地 clarifying-questions skill
-```
-
-### 第 3 步：AI 自己规划
+### Day 1 一次性（项目维护者做一次）
 
 ```sh
-# 路由壳: solution-architect.md
-# → 优先委派 ECC planner + architect
-# → fallback 用本地 impact-analysis skill
-# 产出: 文件改动清单 + 接口契约 + 数据流 + 风险标注
+# 拷贝包到项目根
+cp -r /path/to/loop-orchestrator ./loop-orchestrator
+
+# 跑 install.js (一次性, 5 件事全自动)
+node loop-orchestrator/bin/install.js
+
+# 填 commands.env (按本项目栈)
+$EDITOR .ai/loop/commands.env
+
+# 填 SPEC.md
+cp loop-orchestrator/templates/SPEC.md.template SPEC.md
+$EDITOR SPEC.md
 ```
 
-### 第 4 步：AI 自己写代码
+**到此为止。`install.js` 后续不需要再跑。**
+
+### Day 2+ 日常使用（任何人，零 terminal）
 
 ```sh
-# 路由壳: feature-coder.md
-# → 优先委派 ECC tdd-guide
-# → fallback 用本地 convention-mining
-# TDD 三步: 红 → 绿 → 重构
-# 风格: 沿用既有代码风格
+# 1. VSCode 打开项目
+# 2. 启动 Claude Code 扩展
+# 3. 在对话里说:
 ```
 
-### 第 5 步：AI 自己审查
+> "我想做 XXX，请按 loop-orchestrator 7 步推进"
 
-```sh
-# 路由壳: code-reviewer.md
-# → 优先委派 ECC code-reviewer + 8 语言 reviewer (按扩展名动态选)
-# → fallback 用本地 self-review
-# 输出: 严重度定级 (CRITICAL/HIGH/MEDIUM/LOW)
-```
+**Claude Code 自动**（你不需要再敲任何命令）：
 
-### 第 6 步：AI 自己改错
+1. **读 `.claude/CLAUDE.md`**（已改写为 loop-orchestrator 总入口）→ 加载 `loop-orchestrator/AGENTS.md`
+2. **加载 15 个 routing shell**（`loop-orchestrator/agents/*.md`）
+3. **加载 16 个物理复制**（`.claude/agents/ecc-*.md`）
+4. **启 PostToolUse hooks**（auto-lint / 危险命令拦截 / 状态文件保护）
+5. **进入 CONTEXT 阶段**（自动 `state.py set-phase CONTEXT`）
+6. **跑 7 步**：
+   - 读仓库 → 解需求 → 规划 → 写代码 → verify（hook 自动）→ 三视角审查 → 修复 → 循环
+7. **在对话里输出结果**（每个阶段你都能看到）
 
-```sh
-# 路由壳: fixer.md
-# → 三分类归因: 测试自身 bug / 自己改动连带 / 真实回归
-# → 优先委派 ECC fixer + build-error-resolver
-# → fallback 用本地 fix-with-rca
-# 修复后必须从 verify 第 1 层重跑
-```
+**你可以打断 / 介入 / 调整方向**（plan §"12 条硬性规则" § 11 自主决策 — 必要时 AI 自己记录台账）。
 
-### 第 7 步：循环再来直至成功
+### 7 步对应
 
-```sh
-# 状态机自动判:
-python loop-orchestrator/scripts/state.py next-round
-#   ↑ 输出 CONTINUE round=N/4  (继续)
-#   ↑ 输出 REPLAN (自动回退 PLAN 换方案, 2 次配额)
-#   ↑ 输出 SAFE_STOP (诚实部分交付, 不可继续修复)
+| 步 | 你在对话里做什么 | Claude Code 自动做什么 |
+|---|---|---|
+| 1 | 说"我要做 XXX" / 改 `SPEC.md` | `requirement-clarifier` + `requirement-analyst` 跑 ECC skill |
+| 2 | 看输出 | (你已经做完，这是 AI 自己做) |
+| 3 | — | `solution-architect` 委派 ECC `planner` + `architect` |
+| 4 | — | `feature-coder` 委派 ECC `tdd-guide` |
+| 5 | — | `code-reviewer` 委派 ECC `code-reviewer` + 8 语言 reviewer |
+| 6 | — | `fixer` 三分类归因修复 |
+| 7 | — | `state.py` 跨 round 检测 + REPLAN / SAFE_STOP |
 
-# 阶段推进:
-python loop-orchestrator/scripts/state.py set-phase CODE
-python loop-orchestrator/scripts/state.py set-phase VERIFY
-bash loop-orchestrator/scripts/verify.sh
-python loop-orchestrator/scripts/state.py record-issue --sig "..." --detail "..."
-#   ↑ 失败记录进 issues[], 跨 round 触发 REPLAN
-```
+### 什么时候需要碰 terminal
+
+**几乎不需要**。例外：
+
+- **第一次 setup**（Day 1）跑 `node install.js`
+- **填 commands.env**（VSCode 也能用 `code .ai/loop/commands.env`）
+- **想 reset state** (`python loop-orchestrator/scripts/state.py reset`)
+- **想看 visibility report** (`node loop-orchestrator/scripts/visibility-report.js`)
+- **手动跑 verify** (`bash loop-orchestrator/scripts/verify.sh`)
+
+**这些是开发者 / 调试用的，不是日常使用。**
+
+## 2. 核心命令速查（开发者用，不是用户用）
+
+| 命令 | 用途 |
+|---|---|
+| `node loop-orchestrator/bin/install.js` | Day 1 一次性 bootstrap |
+| `node loop-orchestrator/bin/install.js --rebuild` | 重建 capabilities.json + 强制覆盖 |
+| `node loop-orchestrator/scripts/visibility-report.js` | ECC 资源可见性报告 (R1 limitation 透明) |
+| `node loop-orchestrator/scripts/size-classify.js --dry-run` | 阶段 0 size 判定 |
+| `python loop-orchestrator/scripts/state.py get` | 读当前 phase / round / baseline |
+| `python loop-orchestrator/scripts/state.py set-phase <PHASE>` | 推进阶段 |
+| `python loop-orchestrator/scripts/state.py next-round` | 跨 round 检测 + REPLAN/SAFE_STOP |
+| `python loop-orchestrator/scripts/state.py record-issue --sig "..."` | 记录失败 |
+| `python loop-orchestrator/scripts/state.py record-decision --question ...` | 自主决策台账 |
+| `bash loop-orchestrator/scripts/verify.sh` | 1+8 层门禁 |
+| `bash loop-orchestrator/scripts/verify.sh` 自动跑 | size-classify + security-gate + 全部层 |
 
 ## 2. 核心命令速查
 
