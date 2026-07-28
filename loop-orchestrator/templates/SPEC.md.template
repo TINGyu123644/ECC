@@ -1,0 +1,105 @@
+# SPEC.md — {{PROJECT_NAME}}
+
+> 模板化 SPEC. `cp loop-orchestrator/templates/SPEC.md.template SPEC.md` 后填字段.
+> 跑 loop-orchestrator 必须先有 SPEC.md (orchestrator / planner 读它).
+
+## 0. 元信息
+
+- **版本**: v0.1.0
+- **负责人**: {{OWNER}}
+- **评审日期**: {{REVIEW_AT}}
+- **关联状态**: `.ai/loop/state.json` (phase / round / baseline)
+
+## 1. 背景 (Context)
+
+{{一段话回答: 这项目要解决什么问题？为什么要做？现在痛点是什么？}}
+
+## 2. 目标 (Goals)
+
+- **G1**: {{目标 1, 可量化}}
+- **G2**: {{目标 2, 可量化}}
+- **G3**: {{目标 3, 可量化}}
+
+## 3. 非目标 (Non-Goals)
+
+- **NG1**: {{明确不做的事}}
+- **NG2**: {{明确不做的事}}
+
+## 4. 验收标准 (Acceptance Criteria)
+
+每条 AC 必须包含 Given / When / Then / Check 四段。
+
+### AC-1: {{一句话}}
+
+- **Given**: {{前提条件}}
+- **When**: {{触发动作}}
+- **Then**: {{可观察结果}}
+- **Check**: {{验证手段 — 命令 / 测试 / curl 指令}}
+
+### AC-2: {{一句话}}
+
+- **Given**: {{...}}
+- **When**: {{...}}
+- **Then**: {{...}}
+- **Check**: {{...}}
+
+### AC-3: {{一句话}}
+
+- **Given**: {{...}}
+- **When**: {{...}}
+- **Then**: {{...}}
+- **Check**: {{...}}
+
+## 5. 范围 (Scope)
+
+### 5.1 In-scope
+
+- {{做}}
+- {{做}}
+- {{做}}
+
+### 5.2 Out-of-scope
+
+- {{不做}}
+- {{不做}}
+
+## 6. 技术约束 (Constraints)
+
+- **语言**: {{ts / py / go / rust}}
+- **包管理**: {{npm / pnpm / yarn / pip / uv / cargo}}
+- **测试框架**: {{jest / pytest / cargo-test / go-test}}
+- **lint 工具**: {{eslint / ruff / clippy}}
+- **目标平台**: {{Node 18+ / Python 3.11+ / Linux / Mac / Windows}}
+
+## 7. 风险 (Risks)
+
+| 风险 | 概率 | 影响 | 缓解 |
+|---|---|---|---|
+| {{R1}} | {{高/中/低}} | {{高/中/低}} | {{...}} |
+| {{R2}} | {{高/中/低}} | {{高/中/低}} | {{...}} |
+| {{R3}} | {{高/中/低}} | {{高/中/低}} | {{...}} |
+
+## 8. 阶段 (Phases)
+
+按 plan §"状态机" 流转：
+
+- **Phase 0 — INIT**: 状态机初始化
+- **Phase 1 — CONTEXT**: context-scout 跑仓库侦察
+- **Phase 2 — REQUIREMENT**: requirement-clarifier + requirement-analyst (读本 SPEC)
+- **Phase 3 — PLAN**: solution-architect + planner 产出实现方案
+- **Phase 4 — CODE**: feature-coder + tdd-guide 写代码
+- **Phase 5 — VERIFY**: regression-guard 跑 verify.sh
+- **Phase 6 — REVIEW**: code-reviewer + security-gate (本仓库修复后)
+- **Phase 7 — FIX**: fixer 三分类归因后修复
+- **Phase 8 — DELIVER**: delivery-reporter 写交付报告
+- **Phase 9 — SAFE_STOP**: 配额尽时诚实部分交付
+
+## 9. 验证 (Verification)
+
+- baseline: `cd ... && node tests/run-all.js` → 期望 passed=N failed=M
+- verify: `bash loop-orchestrator/scripts/verify.sh`
+- uplift: 新增测试 ≥ 0; 失败数 ≤ baseline.failed
+
+## 10. 变更记录 (Changelog)
+
+- {{YYYY-MM-DD}} — v0.1.0 初稿
