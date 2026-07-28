@@ -61,6 +61,17 @@ function parseUnifiedDiff(text) {
   return files;
 }
 
+function stdinHasData() {
+  // piped stdin 才有数据; TTY (用户拉终端跑) 无数据
+  // P2 bug 修复: 旧逻辑 `!process.stdin.isTTY` 在 piped-with-empty-input 也走 stdin 路径, 报 0 files.
+  // 新逻辑: 真正检查 stdin 是否可读, 且第一字节存在
+  try {
+    return fs.fstatSync(0).isFile() && fs.readSync(0, 1).length > 0;
+  } catch {
+    return false;
+  }
+}
+
 function getChangedFiles(args) {
   if (args.patch) {
     if (!fs.existsSync(args.patch)) {
@@ -72,9 +83,11 @@ function getChangedFiles(args) {
   if (args.files) {
     return args.files.split(',').filter(Boolean).map((p) => ({ path: p.trim(), lines: 0 }));
   }
-  if (!process.stdin.isTTY) {
-    const blob = fs.readFileSync(0, 'utf8');
-    return parseUnifiedDiff(blob);
+  if (stdinHasData()) {
+    // 预读了 1 byte, 再读剩余内容
+    const rest = fs.readFileSync(0, 'utf8');
+    const blob = '' + rest;
+    if (blob.trim()) return parseUnifiedDiff(blob);
   }
   let diff;
   try {

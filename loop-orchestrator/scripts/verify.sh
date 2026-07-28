@@ -127,11 +127,13 @@ if git rev-parse --git-dir >/dev/null 2>&1; then
   fi
 fi
 if [[ $security_needed -eq 1 ]]; then
-  if [[ -n "${CMD_SECURITY_GATE:-}" ]]; then
-    run_step "7. security_gate (trigger 命中)" "$CMD_SECURITY_GATE"
-  else
-    echo "## 7. security_gate: SKIPPED (CMD_SECURITY_GATE 未配置)" >> "$REPORT"
-    echo "" >> "$REPORT"
+  # 默认指向 loop-orchestrator/scripts/security-gate.js (P1 段 2)
+  # 命令未配置时用这个默认值, 替代 SKIPPED
+  security_gate_cmd="${CMD_SECURITY_GATE:-node loop-orchestrator/scripts/security-gate.js}"
+  run_step "7. security_gate (trigger 命中)" "$security_gate_cmd"
+  security_gate_rc=$?
+  if [[ $security_gate_rc -ne 0 ]]; then
+    echo "  ↑ security_gate FAIL exit=$security_gate_rc" >> "$REPORT"
   fi
 else
   echo "## 7. security_gate: SKIPPED (no security trigger in diff)" >> "$REPORT"
