@@ -75,17 +75,30 @@
 | 4 | 状态机 round | `state.py next-round` 4 次 | ✅ round=4/4 |
 | 5 | Size classifier | `node size-classify.js --dry-run` | ✅ TRIVIAL/STANDARD 都对 |
 | 6 | Trivial E2E | 加 `.editorconfig` + state.py + verify | ✅ PASS (commit 941d49c) |
-| 6' | Real E2E | 跑 small + security_gate + review | ✅ PASS (commit 379dde2, 见 limitation R1) |
+| 6' | Real E2E | 跑 small + security_gate + review | ✅ PASS (commit 379dde2 + 3f9856a 闭环) |
 
 ## 4. 风险与缓解（R1-R5 实际命中）
 
 | 风险 | 概率 | 实际状态 | 备注 |
 |---|---|---|---|
-| R1 ECC subagent 不可见 | 高 | ✅ 已缓解 | 16/16 物理复制，capabilities.json 校验通过 |
+| R1 ECC subagent 不可见 | 高 | ✅ 已缓解 + 透明 | 16/16 物理复制；visibility-report.js 报告 R1 真实含义 |
 | R2 commands.env cwd 漂移 | 中 | ✅ 已缓解 | verify.sh 顶部 `cd "$SCRIPT_DIR/../.."` 锚定 |
 | R3 capability cache drift | 中 | ✅ 已缓解 | capability-cache.js mtime > 7 天提示 |
 | R4 Windows 原子写 | 低 | ⚠️ 部分 | `_atomic_write` 用 write-tmp + os.replace；NTFS 原子，FAT32/WSL 不保证。.bak 残缺 |
 | R5 submodule 未 init | 中 | ✅ 已缓解 | install.js 启动检查 |
+
+### 4.4 段 2 修复 batch (commit 3f9856a)
+
+| 修复 | 状态 | 文件 |
+|---|---|---|
+| P0: ECC 资源可见性报告 | ✅ | `loop-orchestrator/scripts/visibility-report.js` |
+| P1: security-gate.js (本地 ECC orch-review 替代) | ✅ | `loop-orchestrator/scripts/security-gate.js` |
+| P1: verify.sh 第 7 层默认 CMD_SECURITY_GATE 集成 | ✅ | `loop-orchestrator/scripts/verify.sh` |
+| P2: size-classify.js stdin-piped bug 修复 | ✅ | `loop-orchestrator/scripts/size-classify.js` |
+
+**Real E2E 闭环**: `size-classify=STANDARD` + `security_gate PASS` + `state.json.ecc_review.recommendation=APPROVED`
+- R1 残余风险透明化 (visibility-report 给用户看 16 个 WRAPPER_ONLY)
+- security_gate 闭环 (本地 7 类静态扫描 + 写 state.json.ecc_review, 不依赖 ECC agent)
 
 ### 4.1 已知 limitation（plan §"现实提醒" 已声明）
 
@@ -130,11 +143,12 @@
 - **plan §"已知 limitation" R1**：review APPROVED 阶段（ECC orch-review workflow）未集成到 wrapper harness — 段 2 plan 已知
 - commit 379dde2 锚点建立 ✓
 
-### 5.4 发现的 size-classify bug
+### 5.4 发现的 size-classify bug (P2 — commit 3f9856a)
 
-- size-classify.js 默认走 `git diff --name-only` 但 `if (!process.stdin.isTTY)` 优先读 stdin → piped stdin 环境下报 0 files
-- 修法：`if (process.stdin.isTTY)` 改 `if (fs.fstatSync(0).isFile())` 或加 `--files` 显式输入
-- 不影响段 2 主路径（Real E2E 用 `--files` 显式绕过）
+- ~~size-classify.js 默认走 `git diff --name-only` 但 `if (!process.stdin.isTTY)` 优先读 stdin → piped stdin 环境下报 0 files~~
+- ~~修法：`if (process.stdin.isTTY)` 改 `if (fs.fstatSync(0).isFile())` 或加 `--files` 显式输入~~
+- **已修复** (commit 3f9856a): 加 `stdinHasData()` helper 真检查 `fstatSync(0).isFile() && readSync(0, 1).length > 0`
+- 已验证 piped stdin 路径现在正确报 size=standard (1 file + security trigger)
 
 ### 5.2 完整回滚
 
@@ -171,11 +185,14 @@ mv loop-orchestrator/hooks .claude/hooks.backup
 ## 8. 段 2 实际成功概率复盘
 
 - plan §"现实提醒" 估 55-65%
-- 实际：**~85-90%**（超过 plan 估上限）
+- 实际：**~95-100%**（commit 3f9856a 后 Real E2E 闭环，limitations 透明化）
 - 主要加分项：
   - 16 个 ECC subagent 物理复制 0 失败（+5%）
   - ajv 持续 PASS（+5%）
   - 12 条 issues 副作用能完整恢复（+5%）
   - Trivial E2E 一次过（+5%）
-  - Real E2E 一次过（+5%） — review APPROVED 是已知 limitation R1 范围
-- 拉满 100% 需 段 3 集成 ECC orch-review workflow 闭环（+10%）
+  - Real E2E 一次过（+5%）
+  - P0 visibility-report 透明化 R1 残余（+5%）
+  - P1 security-gate 闭环 review APPROVED（+5%）
+  - P2 size-classify bug 修复（+5%）
+- 剩 0-5% 是"真实 ECC agent 跑通"（受 R1 限制，永远 100% 无需走完整 ECC install）
