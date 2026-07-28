@@ -74,7 +74,7 @@
 | 3 | Capability cache | `jq '.agents\|length'` ≥ 8 | ✅ 71 |
 | 4 | 状态机 round | `state.py next-round` 4 次 | ✅ round=4/4 |
 | 5 | Size classifier | `node size-classify.js --dry-run` | ✅ TRIVIAL/STANDARD 都对 |
-| 6 | Trivial E2E | 加 `.editorconfig` + state.py + verify | ⏳ 紧随本文 |
+| 6 | Trivial E2E | 加 `.editorconfig` + state.py + verify | ✅ PASS (commit 941d49c) |
 | 6' | Real E2E | 跑 small + security_gate + review | ⏳ 暂缓 |
 
 ## 4. 风险与缓解（R1-R5 实际命中）
@@ -107,9 +107,19 @@
 
 ## 5. 回滚
 
-### 5.1 锚点
+### 5.1 锚点 (commit 链)
 
-本文档 + 紧随 commit `feat(loop-orchestrator): 段 2 启动 — 25 文件 + 16 ECC subagent 物理复制` 是回滚锚点。
+| commit | hash | 内容 |
+|---|---|---|
+| `feat(loop-orchestrator): 段 2 启动 — 25 文件 + 16 ECC subagent 物理复制` | `473733d` | 57 文件 +5565 行（段 1 文档 + 段 2 25 文件 + DELIVERY 报告 + .gitignore + 16 ecc-* + 2 wrapper 根改动） |
+| `chore: trivial E2E 锚点 (.editorconfig)` | `941d49c` | 1 文件 + 15 行（.editorconfig root=true） |
+
+### 5.2 Trivial E2E 验证结果
+
+- baseline 3005/12/3017 不变 ✓
+- round 1 → 2 (round+1) ✓
+- ajv PASS, issues=12 ✓
+- commit 941d49c 锚点建立 ✓
 
 ### 5.2 完整回滚
 
@@ -146,9 +156,10 @@ mv loop-orchestrator/hooks .claude/hooks.backup
 ## 8. 段 2 实际成功概率复盘
 
 - plan §"现实提醒" 估 55-65%
-- 实际：**~75-80%**（超过 plan 估上限）
+- 实际：**~80-85%**（超过 plan 估上限）
 - 主要加分项：
   - 16 个 ECC subagent 物理复制 0 失败（+5%）
   - ajv 持续 PASS（+5%）
   - 12 条 issues 副作用能完整恢复（+5%）
-- 拉满 100% 需 Trivial E2E（+5%）+ Real E2E（+5%）
+  - Trivial E2E 一次过（+5%）
+- 拉满 100% 需 Real E2E（+5-10%）
