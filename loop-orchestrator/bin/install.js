@@ -31,6 +31,8 @@ const ROOT = path.resolve(__dirname, '..');
 const WRAPPER_ROOT = path.resolve(ROOT, '..');
 const COMMANDS_ENV_PATH = path.join(WRAPPER_ROOT, '.ai', 'loop', 'commands.env');
 const COMMANDS_ENV_TEMPLATE = path.join(ROOT, 'templates', 'commands.env.example');
+const SPEC_FILE = path.join(WRAPPER_ROOT, 'SPEC.md');
+const SPEC_TEMPLATE = path.join(ROOT, 'templates', 'SPEC.md.template');
 const STATE_FILE = path.join(WRAPPER_ROOT, '.ai', 'loop', 'state.json');
 
 function runNode(script, args, opts = {}) {
@@ -86,7 +88,7 @@ function main() {
   console.log(`ecc-root: ${eccRoot}`);
 
   // 1.5 引导 commands.env 模板 (插拔式: 新项目无 commands.env 自动 cp)
-  console.log('\n--- step 0: bootstrap commands.env ---');
+  console.log('\n--- step 0: bootstrap commands.env + SPEC.md ---');
   if (!fs.existsSync(COMMANDS_ENV_PATH)) {
     if (fs.existsSync(COMMANDS_ENV_TEMPLATE)) {
       fs.mkdirSync(path.dirname(COMMANDS_ENV_PATH), { recursive: true });
@@ -98,6 +100,19 @@ function main() {
     }
   } else {
     console.log(`  commands.env 已存在, 跳过 (--force 不覆盖)`);
+  }
+
+  // 1.6 引导 SPEC.md 模板 (新项目无 SPEC.md 自动 cp)
+  if (!fs.existsSync(SPEC_FILE)) {
+    if (fs.existsSync(SPEC_TEMPLATE)) {
+      fs.copyFileSync(SPEC_TEMPLATE, SPEC_FILE);
+      console.log(`  + copied template -> ${SPEC_FILE}`);
+      console.log(`  ↑ 填项目名 / 负责人 / 3-5 条 AC + Check 命令`);
+    } else {
+      console.warn(`  WARN: template ${SPEC_TEMPLATE} 不存在, 跳过 auto-cp`);
+    }
+  } else {
+    console.log(`  SPEC.md 已存在, 跳过 (--force 不覆盖)`);
   }
 
   // 2. capability-scanner
