@@ -377,7 +377,7 @@ $EDITOR SPEC.md                  # 20 分钟
 loop-orchestrator/
 ├── README.md / SPEC.md / AGENTS.md / ROUTING.md / BOOTSTRAP.md / RISK.md  # 段 1 文档
 ├── state.schema.json / commands.env.schema     # schema 校验
-├── DELIVERY_SEG2.md / USAGE.md                  # 报告 + 使用指南
+├── USAGE.md                                      # 使用指南
 ├── bin/
 │   ├── install.js / install.sh / install.ps1   # 跨平台入口
 ├── scripts/
