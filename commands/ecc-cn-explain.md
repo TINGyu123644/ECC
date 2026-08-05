@@ -13,7 +13,11 @@ description: 打开对应 ECC 机制文档（编排 / 选择 / 错误定位修�
 /ecc-cn-explain selection        → ECC-技能选择机制-渐进式加载.md
 /ecc-cn-explain error-fix        → ECC-错误定位与修复机制.md
 /ecc-cn-explain coupling         → Agent-Skill-耦合方式决策知识库.md
-/ecc-cn-explain                  → 列出所有 4 份文档 + 简介（无参数）
+/ecc-cn-explain sop              → sop-updated.md（6 步插件开发 SOP）
+/ecc-cn-explain skill            → SKILLS.md（291 skill 速查表）
+/ecc-cn-explain agent            → AGENTS.md（73 agent 速查表）
+/ecc-cn-explain command          → COMMANDS.md（96 command 速查表）
+/ecc-cn-explain                  → 列出全部 8 份文档 + 简介（无参数）
 ```
 
 ## 路由逻辑
@@ -24,6 +28,10 @@ description: 打开对应 ECC 机制文档（编排 / 选择 / 错误定位修�
 | `select*`, `选择`, `progressive`, `渐进式`, `fuzzy`, `Top-N`, `三级下钻` | `ECC-技能选择机制-渐进式加载.md` |
 | `error`, `fix`, `bug`, `错误`, `修复`, `build-resolver`, `minimal diff` | `ECC-错误定位与修复机制.md` |
 | `coupling`, `耦合`, `强耦合`, `弱耦合`, `binding` | `Agent-Skill-耦合方式决策知识库.md` |
+| `sop`, `6 步`, `plugin dev`, `插件开发`, `manifest 注册`, `加 skill`, `加 agent` | `sop-updated.md` |
+| `skill`, `skills`, `skill 列表`, `skill 速查`, `skill catalog`, `模块` | `SKILLS.md` |
+| `agent`, `agents`, `agent 列表`, `agent 速查`, `agent catalog`, `reviewer`, `resolver` | `AGENTS.md` |
+| `command`, `commands`, `slash`, `/`, `命令列表`, `命令速查` | `COMMANDS.md` |
 
 ## 不带参数时
 
