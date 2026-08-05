@@ -4,13 +4,13 @@
     "name": "TINGyu123644"
   },
   "metadata": {
-    "description": "ECC 全量中文知识扩展 —— 自包含 ECC 291 skills / 73 agents / 96 commands + 4 份机制文档 + 6 步 SOP"
+    "description": "ECC 全量中文知识扩展 —— 自包含 ECC 287 skills / 73 agents / 102 commands + 4 份机制文档 + 6 步 SOP"
   },
   "plugins": [
     {
       "name": "ecc-cn",
       "source": "./",
-      "description": "Self-contained ECC extension for Chinese-context workflows. Bundles 291 skills / 73 agents / 96 commands from ECC + 4 mechanism knowledge documents (orchestration v2.0, selection v1.2, error localization & fix v1.0, agent-skill coupling decision) + 6-step ECC plugin dev SOP. No dependency on the upstream ecc plugin.",
+      "description": "Self-contained ECC extension for Chinese-context workflows. Bundles 287 skills / 73 agents / 102 commands (287+95 from ECC + 7 ecc-cn-* Chinese extension commands) + 4 mechanism knowledge documents + 6-step ECC plugin dev SOP. No dependency on the upstream ecc plugin.",
       "version": "2.0.0",
       "author": {
         "name": "TINGyu123644"

@@ -14,7 +14,7 @@ description: 打开对应 ECC 机制文档（编排 / 选择 / 错误定位修�
 /ecc-cn-explain error-fix        → ECC-错误定位与修复机制.md
 /ecc-cn-explain coupling         → Agent-Skill-耦合方式决策知识库.md
 /ecc-cn-explain sop              → sop-updated.md（6 步插件开发 SOP）
-/ecc-cn-explain skill            → SKILLS.md（291 skill 速查表）
+/ecc-cn-explain skill            → SKILLS.md（295 skill 速查表）
 /ecc-cn-explain agent            → AGENTS.md（73 agent 速查表）
 /ecc-cn-explain command          → COMMANDS.md（96 command 速查表）
 /ecc-cn-explain                  → 列出全部 8 份文档 + 简介（无参数）

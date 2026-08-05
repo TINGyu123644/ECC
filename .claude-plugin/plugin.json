@@ -1,7 +1,7 @@
 {
   "name": "ecc-cn",
   "version": "2.0.0",
-  "description": "ECC 全量中文知识扩展 —— 自包含 Claude Code plugin，把原版 ECC 的 291 skills / 73 agents / 96 commands 全部打包进来，再叠加 4 份机制知识文档（编排 v2.0 / 选择 v1.2 / 错误定位与修复 v1.0 / Agent-Skill 耦合判定）与插件开发 6 步 SOP（sop-updated.md）。无需依赖 ecc 插件，单装即可获得完整 ECC + 中文知识层。",
+  "description": "ECC 全量中文知识扩展 —— 自包含 Claude Code plugin，把原版 ECC 的 287 skills / 73 agents / 102 commands 全部打包进来（287 skills + 95 commands 来自 ECC-main + 7 个 ecc-cn-* 中文扩展命令），再叠加 4 份机制知识文档与插件开发 6 步 SOP。无需依赖 ecc 插件，单装即可获得完整 ECC + 中文知识层。",
   "author": {
     "name": "TINGyu123644",
     "url": "https://github.com/TINGyu123644"

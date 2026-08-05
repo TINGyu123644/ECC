@@ -1,15 +1,10 @@
 ---
-name: ecc-cn-command-catalog
-description: ECC 全部 96 个 slash command 速查表。当用户想找特定命令 / 问「有哪些 command」时优先触发。触发关键词：「有哪些命令」「command 列表」「command 速查」「command catalog」「/ 开头」「slash 命令」「什么命令能做 X」。
+description: 列出 ECC 全部 102 个 slash command 速查表（含 7 个 ecc-cn-*）
 ---
 
-# ecc-cn-command-catalog
+# /ecc-cn-command-catalog
 
-单一真相源：[`../../COMMANDS.md`](../../COMMANDS.md)（自动生成 · 96 个 command）
-
-## 速查入口
-
-直接读 `COMMANDS.md` 表格，按命令名 + 描述查。
+直接打开 COMMANDS.md（自动生成 · 102 个 command）。
 
 ## 类别速记
 
@@ -23,12 +18,16 @@ description: ECC 全部 96 个 slash command 速查表。当用户想找特定�
 | 项目 / 会话 | `/project-init` / `/projects` / `/promote` / `/prune` / `/pm2` / `/setup-pm` / `/sessions` / `/save-session` / `/resume-session` |
 | Hook / Skill | `/hookify` / `/hookify-configure` / `/hookify-help` / `/hookify-list` / `/skill-create` / `/skill-health` |
 | Loop | `/loop-start` / `/loop-status` / `/santa-loop` |
-| 中文扩展 | `/ecc-cn-explain` |
+| **ecc-cn 中文扩展**（7 个） | `/ecc-cn-explain` / `/ecc-cn-mechanisms` / `/ecc-cn-coupling-decision` / `/ecc-cn-sop` / `/ecc-cn-skill-catalog` / `/ecc-cn-agent-catalog` / `/ecc-cn-command-catalog` |
 
-## 何时调本 skill
+## 何时用
 
-| 场景 | 调 |
+| 场景 | 用 |
 |---|---|
-| 用户问"有哪些命令" | ✅（展示 COMMANDS.md） |
+| 用户问"有哪些命令" | ✅ |
 | 用户问"做 X 调哪个命令" | ✅（按类别定位） |
-| 用户问"加新命令怎么做" | ✅（路由到 `ecc-cn-sop`） |
+| 用户问"加新命令怎么做" | ✅（路由到 `/ecc-cn-sop`） |
+
+## 配套
+
+- 原 `ecc-cn-command-catalog` skill 已被本命令取代

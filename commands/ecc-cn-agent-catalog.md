@@ -1,15 +1,10 @@
 ---
-name: ecc-cn-agent-catalog
-description: ECC 全部 73 个 agent 速查表（含 self-improver / stock-analyst / ecc-plugin-dev-agent 等）。当用户想找特定 agent / 问「有哪些 agent」时优先触发。触发关键词：「有哪些 agent」「agent 列表」「agent 速查」「agent catalog」「reviewer」「resolver」「哪个 agent 该用」。
+description: 列出 ECC 全部 73 个 agent 速查表
 ---
 
-# ecc-cn-agent-catalog
+# /ecc-cn-agent-catalog
 
-单一真相源：[`../../AGENTS.md`](../../AGENTS.md)（自动生成 · 73 个 agent）
-
-## 速查入口
-
-直接读 `AGENTS.md` 顶部表格。
+直接打开 AGENTS.md（自动生成 · 73 个 agent）。
 
 ## 类别速记
 
@@ -24,11 +19,15 @@ description: ECC 全部 73 个 agent 速查表（含 self-improver / stock-analy
 | 数据 / ML | `mle-reviewer` / `database-reviewer` |
 | 业务领域 | `stock-analyst` / `marketing-agent` / `homelab-architect` |
 
-## 何时调本 skill
+## 何时用
 
-| 场景 | 调 |
+| 场景 | 用 |
 |---|---|
-| 用户问"有哪些 agent" | ✅（展示 AGENTS.md） |
+| 用户问"有哪些 agent" | ✅ |
 | 用户问"修这个错调哪个 agent" | ✅（路由到 build-resolver 或 reviewer） |
-| 用户问"加新 agent 怎么分类" | ✅（路由到 `ecc-cn-sop`） |
+| 用户问"加新 agent 怎么分类" | ✅（路由到 `/ecc-cn-sop`） |
 | 用户问具体 agent 怎么用 | ❌（直接调用） |
+
+## 配套
+
+- 原 `ecc-cn-agent-catalog` skill 已被本命令取代
