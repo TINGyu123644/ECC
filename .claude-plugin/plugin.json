@@ -1,0 +1,32 @@
+{
+  "name": "ecc-cn",
+  "version": "1.0.0",
+  "description": "ECC 中文机制知识扩展 —— 把编排机制 (v2.0)、技能选择机制 (v1.2)、错误定位与修复机制 (v1.0)、Agent-Skill 耦合判定 4 份知识文档暴露成可调用的 skill 与命令。本插件是 ECC 之上的薄包装层，不修改原 ECC 任何文件；通过 dependencies 字段自动安装 ecc@^2.0.0。",
+  "author": {
+    "name": "TINGyu123644",
+    "url": "https://github.com/TINGyu123644"
+  },
+  "homepage": "https://github.com/TINGyu123644/ECC",
+  "repository": "https://github.com/TINGyu123644/ECC",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "ecc",
+    "mechanism-docs",
+    "orchestration",
+    "selection",
+    "error-fix",
+    "coupling",
+    "knowledge-layer"
+  ],
+  "mcpServers": {},
+  "skills": [
+    "./skills/"
+  ],
+  "commands": [
+    "./commands/"
+  ],
+  "dependencies": {
+    "ecc": "^2.0.0"
+  }
+}

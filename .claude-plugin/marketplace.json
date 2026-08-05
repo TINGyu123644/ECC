@@ -1,0 +1,43 @@
+{
+  "name": "ecc-cn",
+  "owner": {
+    "name": "TINGyu123644"
+  },
+  "metadata": {
+    "description": "ECC 中文机制知识扩展 —— 编排 / 选择 / 错误定位修复 / 耦合判定 4 份文档作为可调用 skill"
+  },
+  "plugins": [
+    {
+      "name": "ecc-cn",
+      "source": "./",
+      "description": "Chinese-context ECC knowledge extension. Exposes 4 mechanism documents (orchestration v2.0, selection v1.2, error localization & fix v1.0, agent-skill coupling decision) as invocable skills. Thin layer on top of ECC; installs ecc@^2.0.0 as dependency without modifying it.",
+      "version": "1.0.0",
+      "author": {
+        "name": "TINGyu123644"
+      },
+      "homepage": "https://github.com/TINGyu123644/ECC",
+      "repository": "https://github.com/TINGyu123644/ECC",
+      "license": "MIT",
+      "keywords": [
+        "ecc",
+        "mechanism-docs",
+        "knowledge-layer",
+        "orchestration",
+        "selection",
+        "error-fix",
+        "coupling"
+      ],
+      "category": "knowledge",
+      "tags": [
+        "ecc",
+        "knowledge",
+        "docs",
+        "orchestration",
+        "selection",
+        "error-fix",
+        "coupling"
+      ],
+      "strict": false
+    }
+  ]
+}
